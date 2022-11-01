@@ -226,10 +226,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private suspend fun establishVpnInterface() {
         tunInterface = Builder().run {
-            addAddress("10.0.0.2", 32)
-
-            // Add IPv6 Unique Local Address
-            addAddress("fd00:1:fd00:1:fd00:1:fd00:1", 128)
+            vpnNetworkStack.addresses().forEach { addAddress(it.key, it.value) }
 
             // Allow IPv6 to go through the VPN
             // See https://developer.android.com/reference/android/net/VpnService.Builder#allowFamily(int) for more info as to why
@@ -284,6 +281,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                     }
                 }
             }
+
+            vpnNetworkStack.dns().forEach { addDnsServer(it) }
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
