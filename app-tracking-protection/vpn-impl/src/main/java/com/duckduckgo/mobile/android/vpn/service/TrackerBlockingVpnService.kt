@@ -285,7 +285,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
                 }
             }
 
-            vpnNetworkStack.dns().forEach { addDnsServer(it) }
+            vpnNetworkStack.dns().forEach {
+                addRoute(it, 32)
+                addDnsServer(it)
+            }
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
