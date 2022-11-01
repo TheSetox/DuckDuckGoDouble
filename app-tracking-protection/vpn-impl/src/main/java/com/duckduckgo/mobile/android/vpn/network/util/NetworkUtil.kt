@@ -20,7 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.VpnService
-import com.duckduckgo.mobile.android.vpn.service.Route
+import com.duckduckgo.mobile.android.vpn.network.Route
 import java.net.Inet4Address
 import java.net.InetAddress
 

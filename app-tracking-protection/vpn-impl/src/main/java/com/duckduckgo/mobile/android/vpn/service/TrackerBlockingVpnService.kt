@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.mobile.android.vpn.network.VpnRoutesProvider
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
@@ -91,6 +92,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
     @Inject lateinit var vpnNetworkStack: VpnNetworkStack
+
+    @Inject lateinit var vpnRoutesProvider: VpnRoutesProvider
 
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
@@ -238,9 +241,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
                 // Currently allowing host PC address 10.0.2.2 when running performance test on an emulator (normally we don't route local traffic)
                 // The address is also isolated to minimize network interference during performance tests
-                VpnRoutes.includedTestRoutes.forEach { addRoute(it.address, it.maskWidth) }
+                vpnRoutesProvider.getRoutes(true).forEach { addRoute(it.address, it.maskWidth) }
             } else {
-                val vpnRoutes = VpnRoutes.includedRoutes.toMutableSet()
+                val vpnRoutes = vpnRoutesProvider.getRoutes(false).toMutableSet()
                 if (isInterceptDnsTrafficEnabled) {
                     // we need to make sure that all DNS traffic goes through the VPN. Specifically when the DNS server is on the local network
                     dnsList.filterIsInstance<Inet4Address>().forEach { addr ->

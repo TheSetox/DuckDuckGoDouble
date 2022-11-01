@@ -18,6 +18,8 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import com.duckduckgo.mobile.android.vpn.network.RealVpnRoutesProvider
+import com.duckduckgo.mobile.android.vpn.network.Route
 import org.junit.Assert.*
 import org.junit.Test
 import java.net.InetAddress
@@ -280,7 +282,7 @@ class VpnRoutesTest {
         lowest: String,
         highest: String
     ): List<Route> {
-        return VpnRoutes.includedRoutes
+        return RealVpnRoutesProvider().getRoutes(false)
             .filter { it.lowAddress.normalizeIpAddress() <= highest.normalizeIpAddress() }
             .filter { it.highAddress.normalizeIpAddress() >= lowest.normalizeIpAddress() }
     }
